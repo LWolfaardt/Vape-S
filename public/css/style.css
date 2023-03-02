@@ -1,0 +1,196 @@
+/* Banner____________________________ */
+.banner {
+    background-color: yellow;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+}
+
+/* NAVBAR ____________________________ */
+
+img {
+    height: 35px;
+}
+
+li>a::after {
+    content: "";
+    display: block;
+    margin: auto;
+    height: 2px;
+    width: 0;
+    top: 5px;
+    background: transparent;
+    transition: all 0.3s;
+
+}
+
+li>a:hover::after,
+li>a.active-nav::after {
+    width: 100%;
+    background: black;
+}
+
+i {
+    padding: 15px 10px 15px 0;
+}
+
+.menu {
+    font-weight: 500;
+
+}
+
+/* BODY #######################################################################################################*/
+/* bar/legend body */
+.homeicon {
+    height: 300px;
+    width: auto;
+}
+
+/* review body */
+.stars {
+    color: gold;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.star {
+    display: inline;
+}
+
+/* purchase page body */
+.buyImage {
+    width: 60%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* buttons/quantity */
+.quantity {
+    display: flex;
+}
+
+.quantity button {
+    width: 45px;
+    border: 1px solid black;
+
+}
+
+.minus-btn {
+    border-end-end-radius: 0;
+    border-start-end-radius: 0;
+}
+
+.plus-btn {
+    border-end-start-radius: 0;
+    border-start-start-radius: 0;
+}
+
+.quantity input {
+    border: none;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    text-align: center;
+    width: 80px;
+    color: black;
+    font-weight: 400;
+}
+
+/* SWEET AND COOLNESS ICONS + title */
+.coolness {
+    color: grey;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+.sweetness {
+    color: grey;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+.coolnessTitle {
+    color: #0096ff;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+.sweetnessTitle {
+    color: red;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+.coolSweet {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.addToCart {
+    width: 170px;
+}
+
+.quantity input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.quantity input {
+    -moz-appearance: textfield;
+}
+
+/* CART */
+.cartQuantityInput {
+    width: 78px;
+    height: 40px;
+    border: 2px solid black;
+    vertical-align: middle;
+}
+
+.cartQuantity {
+    width: 78px;
+    height: 40px;
+    vertical-align: middle;
+    border-radius: 0;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+    opacity: 1
+}
+
+.removeBtn {
+    background-color: white;
+    border: 0px;
+}
+
+.totalCalculation {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    border-left: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.checkoutBtn {
+    border-radius: 0;
+    width: 100%;
+}
+
+/* WHOLESALE */
+.wholesaleTitle {
+    text-align: center;
+}
+
+.textArea {
+    color: grey;
+}
+
+/* END #######################################################################################################*/
+
+.logo-footer {
+    height: 20px;
+}

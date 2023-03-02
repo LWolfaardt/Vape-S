@@ -1,0 +1,27 @@
+<%- include("header")-%>
+    <div class="container text-center">
+        <div class="row py-5">
+            <h1>All your favourite IGET BAR flavours, right here!</h1>
+
+            <% result.forEach(function(item) { %>
+                <div class="col-sm-6 col-md-4 col-lg-3 py-5">
+                    <img class="homeicon" src="images/<%=item.products_id%>/<%=item.image%>" alt="<%=item.image %>"><br>
+                    <small>
+                        <%= item.products_id %>
+                    </small>
+                    <p>
+                        <%= item.flavor %>
+                    </p>
+                    <% if (item.stock <=0) { %>
+                        <a class="btn btn-dark disabled shopNow" href="#" role="button" name="<%= item.id %>">Out of
+                            Stock</a>
+                        <% } else { %>
+                            <a class="btn btn-dark shopNow" href="/<%=item.id%>" role="button"
+                                name="<%= item.id %>">Shop Now</a>
+                            <% } %>
+                </div>
+                <% }); %>
+        </div>
+    </div>
+    </div>
+    <%- include("footer")-%>

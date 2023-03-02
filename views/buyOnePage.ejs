@@ -1,0 +1,111 @@
+<%- include("header") -%>
+    <div class="container px-0 py-0">
+        <div class="row py-4 px-0">
+            <% result.forEach(function(item) { %>
+                <div class="col-md-6 col-sm-12 text-center px-0 py-0 border">
+                    <img class="buyImage" src="images/<%=item.products_id%>/<%=item.image%>" alt="<%=item.image%>">
+                </div>
+                <div class="col-md-6 col-sm-12 px-4 py-0 mx-0 my-0">
+
+                    <div class="row">
+                        <!-- flavor -->
+                        <div class="col">
+                            <h2 class="my-0">
+                                <%=item.flavor%>
+                            </h2>
+                        </div>
+                        <!-- products_id -->
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="my-0">
+                                    <%=item.products_id%>
+                                </h5>
+                            </div>
+                        </div>
+                        <!-- tag -->
+                        <div class="row  mt-1">
+                            <div class="col">
+                                <h6 class="my-0">
+                                    <%=item.tag%>
+                                </h6>
+                            </div>
+                        </div>
+                        <!-- sweetness  -->
+
+                        <div class="row mt-3">
+                            <div class="col">
+                                <ul class="coolSweet">
+                                    <h6 class="sweetnessTitle my-0">Sweetness: </h6>
+                                    <% for(let i=0; i<4; i++) { %>
+                                        <% if (i < item.sweet) { %>
+                                            <i class="fa-solid fa-candy-cane py-0 sweetness" style="color: red;"></i>
+                                            <% } else { %>
+                                                <i class="fa-solid fa-candy-cane py-0 sweetness"></i>
+                                                <% } %>
+                                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- coolness -->
+                        <div class="row">
+                            <div class="col">
+                                <ul class="coolSweet">
+                                    <h6 class="coolnessTitle my-0">Coolness: </h6>
+                                    <% for(let i=0; i<4; i++) { %>
+                                        <% if (i < item.cool) { %>
+                                            <i class="fa-solid fa-snowflake py-0 coolness" style="color: #0096ff;"></i>
+                                            <% } else { %>
+                                                <i class="fa-solid fa-snowflake py-0 coolness"></i>
+                                                <% } %>
+                                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- price per unit -->
+                        <div class="row mt-3">
+                            <div class="col">
+                                <h4 class="my-0">
+                                    $<%=item.unit1%>
+                                </h4>
+                            </div>
+                        </div>
+                        <!-- quantity -->
+                        <form class="mb-1 mt-2" action="/cart" method="post">
+                            <div class="quantity">
+                                <button class="btn minus-btn disabled btn-dark" type="button">-</button>
+                                <input type="number" name="userQuantity" id="userQuantity" value="1"
+                                    oninput="checkQuantity()" min="1" max="<%= item.stock %>">
+                                <button class="btn plus-btn btn-dark" type="button">+</button>
+                            </div>
+                            <!-- add to cart hideen variables for product-->
+                            <input type="hidden" name="id" value="<%=item.id%>">
+                            <input type="hidden" name="products_id" value="<%=item.products_id%>">
+                            <input type="hidden" name="flavor" value="<%=item.flavor%>">
+                            <input type="hidden" name="image" value="<%=item.image%>">
+                            <input type="hidden" name="stock" id="limitStock" value="<%=item.stock%>">
+                            <input type="hidden" name="price" id="price" value="0">
+                            <!-- add to cart btn -->
+                            <input type="submit" value="Add to cart" class="my-1 btn btn-dark addToCart">
+                        </form>
+                        <!-- stock level -->
+                        <div class="row">
+                            <div class="col">
+                                <small>
+                                    Stock: <%=item.stock%>
+
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+        <% result.forEach(function(item) { if (item.products_id==="IGET BAR" ) { %>
+            <%- include("barDisc") -%>
+                <% } else if (item.products_id==="IGET LEGEND" ) { %>
+                    <%- include("legendDisc") -%>
+                        <% } }); %>
+    </div>
+
+    <%- include("footer")-%>

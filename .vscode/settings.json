@@ -1,0 +1,17 @@
+{
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default"
+      },
+      "previewLimit": 50,
+      "server": "vapestoredb.cirewnwuwtrj.us-east-1.rds.amazonaws.com",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "vapeStoredb",
+      "database": "vapeStore",
+      "username": "root",
+      "askForPassword": true
+    }
+  ]
+}
