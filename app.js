@@ -30,7 +30,7 @@ const db = mysql.createConnection({
   database: process.env.DATABASE,
 });
 
-server.keepAliveTimeout = 65000
+
 
 // Function to check if item is in cart
 function isProductInCart(cart, id) {
@@ -497,6 +497,8 @@ app.get("/:productId", function (req, res) {
   );
 });
 // ______________________________________________________LISTENING
-app.listen(5000, () => {
+app.listen(80, () => {
   console.log("Server up");
 });
+
+server.keepAliveTimeout = 65000
