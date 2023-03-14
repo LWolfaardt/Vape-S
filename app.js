@@ -497,6 +497,6 @@ app.get("/:productId", function (req, res) {
   );
 });
 // ______________________________________________________LISTENING
-app.listen(5000, () => {
+app.listen(3306, () => {
   console.log("Server up");
 });
