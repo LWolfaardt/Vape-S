@@ -27,7 +27,7 @@ const db = mysql.createConnection({
   port: process.env.RDS_PORT,
   user: process.env.RDS_USERNAME,
   password: process.env.RDS_PASSWORD,
-  database: 3306,
+  database: process.env.RDS_PORT,
 });
 
 
