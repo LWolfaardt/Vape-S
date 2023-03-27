@@ -23,11 +23,11 @@ app.use(
 );
 // DATABASE
 const db = mysql.createConnection({
-  host: process.env.HOST,
-  port: process.env.PORT,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
+  host: process.env.RDS_HOSTNAME,
+  port: process.env.RDS_PORT,
+  user: process.env.RDS_USERNAME,
+  password: process.env.RDS_PASSWORD,
+  database: process.env.RDS_DB_NAME,
 });
 
 // Function to check if item is in cart
@@ -495,6 +495,6 @@ app.get("/:productId", function (req, res) {
   );
 });
 // ______________________________________________________LISTENING
-app.listen(3000, () => {
+app.listen(5000, () => {
   console.log("Server up");
 });
