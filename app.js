@@ -324,23 +324,6 @@ let date = getCurrentDate();
 app.post("/create-checkout-session", async (req, res) => {
   const cart = req.session.cart; // get cart from session
 
-  cart.forEach(function (item) {
-    db.query(
-      "INSERT INTO orders (date, orders_id, product_id, product_flavor, product_price,  product_qty) VALUES (?, ?, ?, ?, ?, ?)",
-      [
-        date,
-        orderId,
-        item.products_id,
-        item.flavor,
-        item.price,
-        item.userQuantity,
-      ],
-      function (err, result) {
-        if (err) throw err;
-      }
-    );
-  });
-
   const lineItems = cart.map((item) => {
     return {
       price_data: {
@@ -384,6 +367,7 @@ app.post("/create-checkout-session", async (req, res) => {
     cancel_url: process.env.WEB_ADDI + "/cancel",
     metadata: {
       orderId: orderId,
+      cartItems: JSON.stringify(cart),
     },
   });
   res.redirect(303, session.url);
@@ -435,7 +419,9 @@ app.post(
 
         var customerDetails = checkoutSessionCompleted.customer_details;
         var address = customerDetails.address;
-
+        const cartItems = JSON.parse(
+          checkoutSessionCompleted.metadata.cartItems
+        );
         main();
 
         db.query(
@@ -455,6 +441,45 @@ app.post(
             if (err) throw err;
           }
         );
+        cartItems.forEach(function (item) {
+          // Retrieve current stock level of variant
+          db.query(
+            "SELECT stock FROM variants WHERE id = ?",
+            [item.id],
+            function (err, results) {
+              if (err) throw err;
+
+              // Subtract userQuantity from current stock level
+              const currentStockLevel = results[0].stock;
+              const newStockLevel = currentStockLevel - item.userQuantity;
+
+              // Update database with new stock level
+              db.query(
+                "UPDATE variants SET stock = ? WHERE id = ?",
+                [newStockLevel, item.id],
+                function (err, result) {
+                  if (err) throw err;
+                }
+              );
+
+              // Insert order into orders table
+              db.query(
+                "INSERT INTO orders (date, orders_id, product_id, product_flavor, product_price,  product_qty) VALUES (?, ?, ?, ?, ?, ?)",
+                [
+                  date,
+                  orderId,
+                  item.products_id,
+                  item.flavor,
+                  item.price,
+                  item.userQuantity,
+                ],
+                function (err, result) {
+                  if (err) throw err;
+                }
+              );
+            }
+          );
+        });
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);
@@ -471,14 +496,7 @@ app.get("/success", function (req, res) {
 });
 // ______________________________________________________CANCEL
 app.get("/cancel", function (req, res) {
-  db.query(
-    "DELETE FROM orders WHERE orders_id = ?",
-    [orderId],
-    function (error, results) {
-      if (error) throw error;
-      res.redirect("/cart");
-    }
-  );
+  res.redirect("/cart");
 });
 
 // ______________________________________________________BUY ONE PAGE
