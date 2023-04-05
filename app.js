@@ -5,10 +5,8 @@ const bodyParser = require("body-parser");
 const mysql = require("mysql2");
 const session = require("express-session");
 const stripe = require("stripe")(process.env.STRIPE_KEY);
-const nodemailer = require("nodemailer");
 
 const app = express();
-console.log;
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
