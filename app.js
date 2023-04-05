@@ -397,100 +397,124 @@ async function main() {
   });
 }
 
-app.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  (request, response) => {
-    const sig = request.headers["stripe-signature"];
+// app.post(
+//   "/webhook",
+//   express.raw({ type: "application/json" }),
+//   (request, response) => {
+//     const sig = request.headers["stripe-signature"];
 
-    let event;
+//     let event;
 
-    try {
-      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-    } catch (err) {
-      response.status(400).send(`Webhook Error: ${err.message}`);
-      return;
-    }
+//     try {
+//       event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+//     } catch (err) {
+//       response.status(400).send(`Webhook Error: ${err.message}`);
+//       return;
+//     }
 
-    // Handle the event
-    switch (event.type) {
-      case "checkout.session.completed":
-        const checkoutSessionCompleted = event.data.object;
+//     // Handle the event
+//     switch (event.type) {
+//       case "checkout.session.completed":
+//         const checkoutSessionCompleted = event.data.object;
 
-        var customerDetails = checkoutSessionCompleted.customer_details;
-        var address = customerDetails.address;
-        const cartItems = JSON.parse(
-          checkoutSessionCompleted.metadata.cartItems
-        );
-        main();
+//         var customerDetails = checkoutSessionCompleted.customer_details;
+//         var address = customerDetails.address;
+//         const cartItems = JSON.parse(
+//           checkoutSessionCompleted.metadata.cartItems
+//         );
+//         main();
 
+//         db.query(
+//           "INSERT INTO orders_customers_details (orders_id, name, email, line1, line2, city, state, post_code, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+//           [
+//             orderId,
+//             customerDetails.name,
+//             customerDetails.email,
+//             address.line1,
+//             address.line2,
+//             address.city,
+//             address.state,
+//             address.postal_code,
+//             checkoutSessionCompleted.payment_status,
+//           ],
+//           function (err, result) {
+//             if (err) throw err;
+//           }
+//         );
+//         cartItems.forEach(function (item) {
+//           // Retrieve current stock level of variant
+//           db.query(
+//             "SELECT stock FROM variants WHERE id = ?",
+//             [item.id],
+//             function (err, results) {
+//               if (err) throw err;
+
+//               // Subtract userQuantity from current stock level
+//               const currentStockLevel = results[0].stock;
+//               const newStockLevel = currentStockLevel - item.userQuantity;
+
+//               // Update database with new stock level
+//               db.query(
+//                 "UPDATE variants SET stock = ? WHERE id = ?",
+//                 [newStockLevel, item.id],
+//                 function (err, result) {
+//                   if (err) throw err;
+//                 }
+//               );
+
+//               // Insert order into orders table
+//               db.query(
+//                 "INSERT INTO orders (date, orders_id, product_id, product_flavor, product_price,  product_qty) VALUES (?, ?, ?, ?, ?, ?)",
+//                 [
+//                   date,
+//                   orderId,
+//                   item.products_id,
+//                   item.flavor,
+//                   item.price,
+//                   item.userQuantity,
+//                 ],
+//                 function (err, result) {
+//                   if (err) throw err;
+//                 }
+//               );
+//             }
+//           );
+//         });
+//         break;
+//       default:
+//         console.log(`Unhandled event type ${event.type}`);
+//     }
+
+//     // Return a 200 response to acknowledge receipt of the event
+//     response.send();
+//   }
+// );
+// ______________________________________________________SUCCESS
+app.get("/success", function (req, res) {
+  const cart = req.session.cart;
+  cart.forEach(function (item) {
+    // Retrieve current stock level of variant
+    db.query(
+      "SELECT stock FROM variants WHERE id = ?",
+      [item.id],
+      function (err, results) {
+        if (err) throw err;
+
+        // Subtract userQuantity from current stock level
+        const currentStockLevel = results[0].stock;
+        const newStockLevel = currentStockLevel - item.userQuantity;
+
+        // Update database with new stock level
         db.query(
-          "INSERT INTO orders_customers_details (orders_id, name, email, line1, line2, city, state, post_code, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-          [
-            orderId,
-            customerDetails.name,
-            customerDetails.email,
-            address.line1,
-            address.line2,
-            address.city,
-            address.state,
-            address.postal_code,
-            checkoutSessionCompleted.payment_status,
-          ],
+          "UPDATE variants SET stock = ? WHERE id = ?",
+          [newStockLevel, item.id],
           function (err, result) {
             if (err) throw err;
           }
         );
-        cartItems.forEach(function (item) {
-          // Retrieve current stock level of variant
-          db.query(
-            "SELECT stock FROM variants WHERE id = ?",
-            [item.id],
-            function (err, results) {
-              if (err) throw err;
-
-              // Subtract userQuantity from current stock level
-              const currentStockLevel = results[0].stock;
-              const newStockLevel = currentStockLevel - item.userQuantity;
-
-              // Update database with new stock level
-              db.query(
-                "UPDATE variants SET stock = ? WHERE id = ?",
-                [newStockLevel, item.id],
-                function (err, result) {
-                  if (err) throw err;
-                }
-              );
-
-              // Insert order into orders table
-              db.query(
-                "INSERT INTO orders (date, orders_id, product_id, product_flavor, product_price,  product_qty) VALUES (?, ?, ?, ?, ?, ?)",
-                [
-                  date,
-                  orderId,
-                  item.products_id,
-                  item.flavor,
-                  item.price,
-                  item.userQuantity,
-                ],
-                function (err, result) {
-                  if (err) throw err;
-                }
-              );
-            }
-          );
-        });
-        break;
-      default:
-        console.log(`Unhandled event type ${event.type}`);
-    }
-
-    // Return a 200 response to acknowledge receipt of the event
-    response.send();
-  }
-);
-// ______________________________________________________SUCCESS
-app.get("/success", function (req, res) {
+      }
+    );
+  });
   req.session.destroy();
   res.render("success");
 });
