@@ -373,125 +373,15 @@ app.post("/create-checkout-session", async (req, res) => {
   res.redirect(303, session.url);
 });
 
-// ______________________________________________________WEBHOOK
-const endpointSecret = process.env.ENDPOINT_SECRET;
-
-async function main() {
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.outlook.com",
-    port: process.env.EMAIL_PORT,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.EMAIL, // generated ethereal user
-      pass: process.env.EMAIL_PASSWORD, // generated ethereal password
-    },
-  });
-
-  // send mail with defined transport object
-  let info = await transporter.sendMail({
-    from: process.env.EMAIL, // sender address
-    to: process.env.EMAIL, // list of receivers
-    subject: "NEW ORDER", // Subject line
-    text: orderId, // plain text body
-  });
-}
-
-// app.post(
-//   "/webhook",
-//   express.raw({ type: "application/json" }),
-//   (request, response) => {
-//     const sig = request.headers["stripe-signature"];
-
-//     let event;
-
-//     try {
-//       event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-//     } catch (err) {
-//       response.status(400).send(`Webhook Error: ${err.message}`);
-//       return;
-//     }
-
-//     // Handle the event
-//     switch (event.type) {
-//       case "checkout.session.completed":
-//         const checkoutSessionCompleted = event.data.object;
-
-//         var customerDetails = checkoutSessionCompleted.customer_details;
-//         var address = customerDetails.address;
-//         const cartItems = JSON.parse(
-//           checkoutSessionCompleted.metadata.cartItems
-//         );
-//         main();
-
-//         db.query(
-//           "INSERT INTO orders_customers_details (orders_id, name, email, line1, line2, city, state, post_code, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-//           [
-//             orderId,
-//             customerDetails.name,
-//             customerDetails.email,
-//             address.line1,
-//             address.line2,
-//             address.city,
-//             address.state,
-//             address.postal_code,
-//             checkoutSessionCompleted.payment_status,
-//           ],
-//           function (err, result) {
-//             if (err) throw err;
-//           }
-//         );
-//         cartItems.forEach(function (item) {
-//           // Retrieve current stock level of variant
-//           db.query(
-//             "SELECT stock FROM variants WHERE id = ?",
-//             [item.id],
-//             function (err, results) {
-//               if (err) throw err;
-
-//               // Subtract userQuantity from current stock level
-//               const currentStockLevel = results[0].stock;
-//               const newStockLevel = currentStockLevel - item.userQuantity;
-
-//               // Update database with new stock level
-//               db.query(
-//                 "UPDATE variants SET stock = ? WHERE id = ?",
-//                 [newStockLevel, item.id],
-//                 function (err, result) {
-//                   if (err) throw err;
-//                 }
-//               );
-
-//               // Insert order into orders table
-//               db.query(
-//                 "INSERT INTO orders (date, orders_id, product_id, product_flavor, product_price,  product_qty) VALUES (?, ?, ?, ?, ?, ?)",
-//                 [
-//                   date,
-//                   orderId,
-//                   item.products_id,
-//                   item.flavor,
-//                   item.price,
-//                   item.userQuantity,
-//                 ],
-//                 function (err, result) {
-//                   if (err) throw err;
-//                 }
-//               );
-//             }
-//           );
-//         });
-//         break;
-//       default:
-//         console.log(`Unhandled event type ${event.type}`);
-//     }
-
-//     // Return a 200 response to acknowledge receipt of the event
-//     response.send();
-//   }
-// );
 // ______________________________________________________SUCCESS
 app.get("/success", function (req, res) {
-  const cart = req.session.cart;
+  const cart = req.session.cart || [];
+
+  if (cart.length === 0) {
+    // handle empty cart case
+    return res.redirect("/");
+  }
+
   cart.forEach(function (item) {
     // Retrieve current stock level of variant
     db.query(
@@ -515,8 +405,13 @@ app.get("/success", function (req, res) {
       }
     );
   });
-  req.session.destroy();
-  res.render("success");
+
+  req.session.destroy(function (err) {
+    if (err) {
+      console.error("Failed to destroy session: ", err);
+    }
+    res.render("success");
+  });
 });
 // ______________________________________________________CANCEL
 app.get("/cancel", function (req, res) {
