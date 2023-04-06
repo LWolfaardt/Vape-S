@@ -291,34 +291,6 @@ app.get("/cart", function (req, res) {
   });
 });
 // ______________________________________________________Checkout
-
-let orderId; // Define the orderId variable outside of the function
-
-// Function to generate a unique order code
-function generateUniqueCode() {
-  let code = "";
-  const possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (let i = 0; i < 6; i++) {
-    code += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-
-  orderId = code; // Set the generated code to the orderId variable
-
-  return code;
-}
-orderId = generateUniqueCode();
-
-function getCurrentDate() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-let date = getCurrentDate();
 app.post("/create-checkout-session", async (req, res) => {
   const cart = req.session.cart; // get cart from session
 
@@ -340,7 +312,7 @@ app.post("/create-checkout-session", async (req, res) => {
   const cartTotal = calculateCartTotal(cart);
 
   // Determine shipping cost based on cart total
-  let shippingCost = 1295;
+  let shippingCost = 1000;
   if (cartTotal >= 100) {
     shippingCost = 0;
   }
@@ -351,10 +323,21 @@ app.post("/create-checkout-session", async (req, res) => {
         shipping_rate_data: {
           type: "fixed_amount",
           fixed_amount: { amount: shippingCost, currency: "aud" },
-          display_name: "Express shipping",
+          display_name: "Standard shipping",
           delivery_estimate: {
             minimum: { unit: "business_day", value: 3 },
-            maximum: { unit: "business_day", value: 5 },
+            maximum: { unit: "business_day", value: 7 },
+          },
+        },
+      },
+      {
+        shipping_rate_data: {
+          type: "fixed_amount",
+          fixed_amount: { amount: 1500, currency: "aud" },
+          display_name: "Express shipping",
+          delivery_estimate: {
+            minimum: { unit: "business_day", value: 1 },
+            maximum: { unit: "business_day", value: 3 },
           },
         },
       },
@@ -363,10 +346,7 @@ app.post("/create-checkout-session", async (req, res) => {
     mode: "payment",
     success_url: process.env.WEB_ADDI + "/success",
     cancel_url: process.env.WEB_ADDI + "/cancel",
-    metadata: {
-      orderId: orderId,
-      cartItems: JSON.stringify(cart),
-    },
+    metadata: {},
   });
   res.redirect(303, session.url);
 });
