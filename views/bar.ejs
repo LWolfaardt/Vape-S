@@ -13,7 +13,7 @@
                         <%= item.flavor %>
                     </p>
                     <% if (item.stock <=0) { %>
-                        <a class="btn btn-dark disabled shopNow" href="#" role="button" name="<%= item.id %>">Out of
+                        <a class="btn btn-dark disabled shopNow" href="#" role="button" id="<%= item.id %>">Out of
                             Stock</a>
                         <% } else { %>
                             <a class="btn btn-dark shopNow" href="/<%=item.id%>" role="button"
