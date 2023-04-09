@@ -173,7 +173,7 @@ app.get("/terms-and-conditions", function (req, res) {
 // ______________________________________________________index-legends
 app.get("/", function (req, res) {
   db.query(
-    "SELECT * FROM variants WHERE (products_id) = 'IGET LEGEND'",
+    "SELECT * FROM variants WHERE (products_id) = 'IGET-LEGEND'",
     function (err, result) {
       if (err) throw err;
       res.render("legend", { result: result });
@@ -183,7 +183,7 @@ app.get("/", function (req, res) {
 // _______________________________________________________________bar
 app.get("/bar", function (req, res) {
   db.query(
-    "SELECT * FROM variants WHERE (products_id) = 'IGET BAR'",
+    "SELECT * FROM variants WHERE (products_id) = 'IGET-BAR'",
     function (err, result) {
       if (err) throw err;
       res.render("bar", { result: result });
